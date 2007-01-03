@@ -1,0 +1,41 @@
+= escape - HTML/URI/shell escaping utilities
+
+== Author
+
+Tanaka Akira <akr@fsij.org>
+
+== License
+
+The modified BSD licence
+
+== Feature
+
+* several escaping/composing functions
+  * HTML text
+  * HTML attribute
+  * HTML form
+  * URI path
+  * shell command line
+* non-string-to-string functions for ease real usages and avoid double-escape
+
+== Requirements
+
+* ruby : http://www.ruby-lang.org/
+
+== Download
+
+* latest release: none
+
+* developpment version in Subversion repository:
+
+    % svn co svn://svn@svn.a-k-r.org/akr/escape/trunk escape
+
+== Install
+
+  % ruby install.rb
+
+== Reference Manual
+
+See doc/classes/Escape.html or
+http://www.a-k-r.org/escape/rdoc/classes/Escape.html
+

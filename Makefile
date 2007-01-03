@@ -1,0 +1,2 @@
+rdoc:
+	rdoc escape.rb
