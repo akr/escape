@@ -18,6 +18,17 @@ The modified BSD licence
   * shell command line
 * non-string-to-string functions for ease real usages and avoid double-escape
 
+== Usage
+
+  require 'escape'
+
+  Escape.shell_command(["echo", "*"]) #=> "echo '*'"
+  Escape.uri_path("a?b/c?d/e?f") #=> "a%3Fb/c%3Fd/e%3Ff"
+  Escape.html_form([["a","b"], ["c","d"]]) #=> "a=b&c=d"
+  Escape.html_form({"a"=>"b", "c"=>"d"}) #=> "a=b&c=d"
+  Escape.html_text("a & b < c > d") #=> "a &amp; b &lt; c &gt; d"
+  Escape.html_attr("ab&<>\"c") #=> "\"ab&amp;&lt;&gt;&quot;c\""
+
 == Requirements
 
 * ruby : http://www.ruby-lang.org/
