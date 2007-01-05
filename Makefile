@@ -1,2 +1,2 @@
 rdoc:
-	rdoc escape.rb
+	rdoc --op rdoc escape.rb
