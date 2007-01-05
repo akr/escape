@@ -13,7 +13,7 @@ The modified BSD licence
 * several escaping/composing functions
   * HTML text
   * HTML attribute
-  * HTML form
+  * HTML form (x-www-form-urlencoded)
   * URI path
   * shell command line
 * non-string-to-string functions for ease real usages and avoid double-escape
@@ -36,6 +36,6 @@ The modified BSD licence
 
 == Reference Manual
 
-See doc/classes/Escape.html or
+See rdoc/classes/Escape.html or
 http://www.a-k-r.org/escape/rdoc/classes/Escape.html
 
