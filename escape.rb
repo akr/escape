@@ -80,14 +80,17 @@ module Escape
     end
   end
 
-  class PercentEncoded
-    class << self
-      alias new_no_dup new
-      def new(str)
-        new_no_dup(str.dup)
-      end
+  module StringWrapperC
+    def new(str)
+      super(str.dup)
     end
 
+    def new_no_dup(str)
+      Class.instance_method(:new).bind(self).call(str)
+    end
+  end
+
+  module StringWrapper
     def initialize(str)
       @str = str
     end
@@ -108,6 +111,11 @@ module Escape
     def hash
       @str.hash
     end
+  end
+
+  class PercentEncoded
+    extend StringWrapperC
+    include StringWrapper
   end
 
   # Escape.uri_segment escapes URI segment using percent-encoding.

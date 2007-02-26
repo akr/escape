@@ -31,6 +31,14 @@ class TestEscapePercentEncoded < Test::Unit::TestCase
     assert_equal(2, h[v1])
   end
 
+  def test_new_dup
+    s = "a"
+    o = Escape::PercentEncoded.new(s)
+    assert_not_equal(s.object_id, o.instance_variable_get(:@str).object_id)
+    o = Escape::PercentEncoded.new_no_dup(s)
+    assert_equal(s.object_id, o.instance_variable_get(:@str).object_id)
+  end
+
   def assert_equal_pe(str, tst)
     assert_equal(Escape::PercentEncoded.new(str), tst)
   end
