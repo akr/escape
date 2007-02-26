@@ -80,9 +80,39 @@ module Escape
     end
   end
 
+  class PercentEncoded
+    class << self
+      alias new_no_dup new
+      def new(str)
+        new_no_dup(str.dup)
+      end
+    end
+
+    def initialize(str)
+      @str = str
+    end
+
+    def to_s
+      @str.dup
+    end
+
+    def inspect
+      "\#<#{self.class}: #{@str}>"
+    end
+
+    def ==(other)
+      other.class == self.class && @str == other.instance_variable_get(:@str)
+    end
+    alias eql? ==
+
+    def hash
+      @str.hash
+    end
+  end
+
   # Escape.uri_segment escapes URI segment using percent-encoding.
   #
-  #  Escape.uri_segment("a/b") #=> "a%2Fb"
+  #  Escape.uri_segment("a/b") #=> #<Escape::PercentEncoded: a%2Fb>
   #
   # The segment is "/"-splitted element after authority before query in URI, as follows.
   #
@@ -93,17 +123,18 @@ module Escape
     # pchar - pct-encoded = unreserved / sub-delims / ":" / "@"
     # unreserved = ALPHA / DIGIT / "-" / "." / "_" / "~"
     # sub-delims = "!" / "$" / "&" / "'" / "(" / ")" / "*" / "+" / "," / ";" / "="
-    str.gsub(%r{[^A-Za-z0-9\-._~!$&'()*+,;=:@]}n) {
+    s = str.gsub(%r{[^A-Za-z0-9\-._~!$&'()*+,;=:@]}n) {
       '%' + $&.unpack("H2")[0].upcase
     }
+    PercentEncoded.new_no_dup(s)
   end
 
   # Escape.uri_path escapes URI path using percent-encoding.
   # The given path should be a sequence of (non-escaped) segments separated by "/".
   # The segments cannot contains "/".
   #
-  #  Escape.uri_path("a/b/c") #=> "a/b/c"
-  #  Escape.uri_path("a?b/c?d/e?f") #=> "a%3Fb/c%3Fd/e%3Ff"
+  #  Escape.uri_path("a/b/c") #=> #<Escape::PercentEncoded: a/b/c>
+  #  Escape.uri_path("a?b/c?d/e?f") #=> #<Escape::PercentEncoded: a%3Fb/c%3Fd/e%3Ff>
   #
   # The path is the part after authority before query in URI, as follows.
   #
@@ -113,12 +144,13 @@ module Escape
   #
   # Note that this function is not appropriate to convert OS path to URI.
   def uri_path(str)
-    str.gsub(%r{[^/]+}n) { uri_segment($&) }
+    s = str.gsub(%r{[^/]+}n) { uri_segment($&) }
+    PercentEncoded.new_no_dup(s)
   end
 
   # :stopdoc:
-  def html_form_fast(pairs, sep=';')
-    pairs.map {|k, v|
+  def html_form_fast(pairs, sep='&')
+    s = pairs.map {|k, v|
       # query-chars - pct-encoded - x-www-form-urlencoded-delimiters =
       #   unreserved / "!" / "$" / "'" / "(" / ")" / "*" / "," / ":" / "@" / "/" / "?"
       # query-char - pct-encoded = unreserved / sub-delims / ":" / "@" / "/" / "?"
@@ -134,6 +166,7 @@ module Escape
       }
       "#{k}=#{v}"
     }.join(sep)
+    PercentEncoded.new_no_dup(s)
   end
   # :startdoc:
 
@@ -142,23 +175,23 @@ module Escape
   # Escape.html_form takes an array of pair of strings or
   # an hash from string to string.
   #
-  #  Escape.html_form([["a","b"], ["c","d"]]) #=> "a=b&c=d"
-  #  Escape.html_form({"a"=>"b", "c"=>"d"}) #=> "a=b&c=d"
+  #  Escape.html_form([["a","b"], ["c","d"]]) #=> #<Escape::PercentEncoded: a=b&c=d>
+  #  Escape.html_form({"a"=>"b", "c"=>"d"}) #=> #<Escape::PercentEncoded: a=b&c=d>
   #
   # In the array form, it is possible to use same key more than once.
   # (It is required for a HTML form which contains
   # checkboxes and select element with multiple attribute.)
   #
-  #  Escape.html_form([["k","1"], ["k","2"]]) #=> "k=1&k=2"
+  #  Escape.html_form([["k","1"], ["k","2"]]) #=> #<Escape::PercentEncoded: k=1&k=2>
   #
   # If the strings contains characters which must be escaped in x-www-form-urlencoded,
   # they are escaped using %-encoding.
   #
-  #  Escape.html_form([["k=","&;="]]) #=> "k%3D=%26%3B%3D"
+  #  Escape.html_form([["k=","&;="]]) #=> #<Escape::PercentEncoded: k%3D=%26%3B%3D>
   #
   # The separator can be specified by the optional second argument.
   #
-  #  Escape.html_form([["a","b"], ["c","d"]], ";") #=> "a=b;c=d"
+  #  Escape.html_form([["a","b"], ["c","d"]], ";") #=> #<Escape::PercentEncoded: a=b;c=d>
   #
   # See HTML 4.01 for details.
   def html_form(pairs, sep='&')
@@ -192,7 +225,7 @@ module Escape
         end
       }
     }
-    r
+    PercentEncoded.new_no_dup(r)
   end
 
   # :stopdoc:
