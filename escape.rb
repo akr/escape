@@ -261,12 +261,12 @@ module Escape
   }
   # :startdoc:
 
-  # Escape.html_attr encodes a string as a double-quoted HTML attribute using character references.
+  # Escape.html_attr_value encodes a string as a double-quoted HTML attribute using character references.
   #
-  #  Escape.html_attr("abc") #=> "\"abc\""
-  #  Escape.html_attr("a&b") #=> "\"a&amp;b\""
-  #  Escape.html_attr("ab&<>\"c") #=> "\"ab&amp;&lt;&gt;&quot;c\""
-  #  Escape.html_attr("a'c") #=> "\"a'c\""
+  #  Escape.html_attr_value("abc") #=> "\"abc\""
+  #  Escape.html_attr_value("a&b") #=> "\"a&amp;b\""
+  #  Escape.html_attr_value("ab&<>\"c") #=> "\"ab&amp;&lt;&gt;&quot;c\""
+  #  Escape.html_attr_value("a'c") #=> "\"a'c\""
   #
   # It escapes 4 characters:
   # * '&' to '&amp;'
@@ -274,7 +274,7 @@ module Escape
   # * '>' to '&gt;'
   # * '"' to '&quot;'
   #
-  def html_attr(str)
+  def html_attr_value(str)
     '"' + str.gsub(/[&<>"]/) {|ch| HTML_ATTR_ESCAPE_HASH[ch] } + '"'
   end
 end

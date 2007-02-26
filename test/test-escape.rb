@@ -10,8 +10,8 @@ class TestEscape < Test::Unit::TestCase
     assert_equal('a&amp;&lt;&gt;"', Escape.html_text('a&<>"'))
   end
 
-  def test_html_attr
-    assert_equal('"a&amp;&lt;&gt;&quot;"', Escape.html_attr('a&<>"'))
+  def test_html_attr_value
+    assert_equal('"a&amp;&lt;&gt;&quot;"', Escape.html_attr_value('a&<>"'))
   end
 end
 
