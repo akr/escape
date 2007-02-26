@@ -31,55 +31,6 @@
 module Escape
   module_function
 
-  # Escape.shell_command composes
-  # a sequence of words to
-  # a single shell command line.
-  # All shell meta characters are quoted and
-  # the words are concatenated with interleaving space.
-  #
-  #  Escape.shell_command(["ls", "/"]) #=> "ls /"
-  #  Escape.shell_command(["echo", "*"]) #=> "echo '*'"
-  #
-  # Note that system(*command) and
-  # system(Escape.shell_command(command)) is roughly same.
-  # There are two exception as follows.
-  # * The first is that the later may invokes /bin/sh.
-  # * The second is an interpretation of an array with only one element: 
-  #   the element is parsed by the shell with the former but
-  #   it is recognized as single word with the later.
-  #   For example, system(*["echo foo"]) invokes echo command with an argument "foo".
-  #   But system(Escape.shell_command(["echo foo"])) invokes "echo foo" command without arguments (and it probably fails).
-  def shell_command(command)
-    command.map {|word| shell_single_word(word) }.join(' ')
-  end
-
-  # Escape.shell_single_word quotes shell meta characters.
-  #
-  # The result string is always single shell word, even if
-  # the argument is "".
-  # Escape.shell_single_word("") returns "''".
-  #
-  #  Escape.shell_single_word("") #=> "''"
-  #  Escape.shell_single_word("foo") #=> "foo"
-  #  Escape.shell_single_word("*") #=> "'*'"
-  def shell_single_word(str)
-    if str.empty?
-      "''"
-    elsif %r{\A[0-9A-Za-z+,./:=@_-]+\z} =~ str
-      str
-    else
-      result = ''
-      str.scan(/('+)|[^']+/) {
-        if $1
-          result << %q{\'} * $1.length
-        else
-          result << "'#{$&}'"
-        end
-      }
-      result
-    end
-  end
-
   module StringWrapperC
     def new(str)
       super(str.dup)
@@ -110,6 +61,62 @@ module Escape
 
     def hash
       @str.hash
+    end
+  end
+
+
+  class ShellEscaped
+    extend StringWrapperC
+    include StringWrapper
+  end
+
+  # Escape.shell_command composes
+  # a sequence of words to
+  # a single shell command line.
+  # All shell meta characters are quoted and
+  # the words are concatenated with interleaving space.
+  #
+  #  Escape.shell_command(["ls", "/"]) #=> #<Escape::ShellEscaped: ls />
+  #  Escape.shell_command(["echo", "*"]) #=> #<Escape::ShellEscaped: echo '*'>
+  #
+  # Note that system(*command) and
+  # system(Escape.shell_command(command)) is roughly same.
+  # There are two exception as follows.
+  # * The first is that the later may invokes /bin/sh.
+  # * The second is an interpretation of an array with only one element: 
+  #   the element is parsed by the shell with the former but
+  #   it is recognized as single word with the later.
+  #   For example, system(*["echo foo"]) invokes echo command with an argument "foo".
+  #   But system(Escape.shell_command(["echo foo"])) invokes "echo foo" command without arguments (and it probably fails).
+  def shell_command(command)
+    s = command.map {|word| shell_single_word(word) }.join(' ')
+    ShellEscaped.new_no_dup(s)
+  end
+
+  # Escape.shell_single_word quotes shell meta characters.
+  #
+  # The result string is always single shell word, even if
+  # the argument is "".
+  # Escape.shell_single_word("") returns #<Escape::ShellEscaped: ''>.
+  #
+  #  Escape.shell_single_word("") #=> #<Escape::ShellEscaped: ''>
+  #  Escape.shell_single_word("foo") #=> #<Escape::ShellEscaped: foo>
+  #  Escape.shell_single_word("*") #=> #<Escape::ShellEscaped: '*'>
+  def shell_single_word(str)
+    if str.empty?
+      ShellEscaped.new_no_dup("''")
+    elsif %r{\A[0-9A-Za-z+,./:=@_-]+\z} =~ str
+      ShellEscaped.new(str)
+    else
+      result = ''
+      str.scan(/('+)|[^']+/) {
+        if $1
+          result << %q{\'} * $1.length
+        else
+          result << "'#{$&}'"
+        end
+      }
+      ShellEscaped.new_no_dup(result)
     end
   end
 
@@ -256,8 +263,8 @@ module Escape
   # * '<' to '&lt;'
   # * '>' to '&gt;'
   #
-  #  Escape.html_text("abc") #=> "abc"
-  #  Escape.html_text("a & b < c > d") #=> "a &amp; b &lt; c &gt; d"
+  #  Escape.html_text("abc") #=> #<Escape::HTMLEscaped: abc>
+  #  Escape.html_text("a & b < c > d") #=> #<Escape::HTMLEscaped: a &amp; b &lt; c &gt; d>
   #
   # This function is not appropriate for escaping HTML element attribute
   # because quotes are not escaped.
@@ -277,10 +284,10 @@ module Escape
 
   # Escape.html_attr_value encodes a string as a double-quoted HTML attribute using character references.
   #
-  #  Escape.html_attr_value("abc") #=> "\"abc\""
-  #  Escape.html_attr_value("a&b") #=> "\"a&amp;b\""
-  #  Escape.html_attr_value("ab&<>\"c") #=> "\"ab&amp;&lt;&gt;&quot;c\""
-  #  Escape.html_attr_value("a'c") #=> "\"a'c\""
+  #  Escape.html_attr_value("abc") #=> #<Escape::HTMLEscaped: "abc">
+  #  Escape.html_attr_value("a&b") #=> #<Escape::HTMLEscaped: "a&amp;b">
+  #  Escape.html_attr_value("ab&<>\"c") #=> #<Escape::HTMLEscaped: "ab&amp;&lt;&gt;&quot;c">
+  #  Escape.html_attr_value("a'c") #=> #<Escape::HTMLEscaped: "a'c">
   #
   # It escapes 4 characters:
   # * '&' to '&amp;'

@@ -1,10 +1,23 @@
 require 'test/unit'
 require 'escape'
 
-class TestEscape < Test::Unit::TestCase
-  def test_shell_command
-    assert_equal("com arg", Escape.shell_command(%w[com arg]))
+class TestEscapeShellEscaped < Test::Unit::TestCase
+  def assert_equal_se(str, tst)
+    assert_equal(Escape::ShellEscaped.new(str), tst)
   end
+
+  def test_shell_command
+    assert_equal_se("com arg", Escape.shell_command(%w[com arg]))
+    assert_equal_se("ls /", Escape.shell_command(%w[ls /]))
+    assert_equal_se("echo '*'", Escape.shell_command(%w[echo *]))
+  end
+
+  def test_shell_single_word
+    assert_equal_se("''", Escape.shell_single_word(''))
+    assert_equal_se("foo", Escape.shell_single_word('foo'))
+    assert_equal_se("'*'", Escape.shell_single_word('*'))
+  end
+
 end
 
 class TestEscapePercentEncoded < Test::Unit::TestCase

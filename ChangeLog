@@ -1,5 +1,9 @@
 2007-02-26  Tanaka Akira  <akr@fsij.org>
 
+	* escape.rb: Escape::ShellEscaped defined.
+	  Escape.shell_command and Escape.shell_single_word returns
+	  Escape::ShellEscaped object instead of a string.
+
 	* escape.rb: Escape::HTMLEscaped defined.
 	  Escape.html_text and Escape.html_attr_value returns
 	  Escape::HTMLEscaped object instead of a string.
