@@ -236,6 +236,11 @@ module Escape
     PercentEncoded.new_no_dup(r)
   end
 
+  class HTMLEscaped
+    extend StringWrapperC
+    include StringWrapper
+  end
+
   # :stopdoc:
   HTML_TEXT_ESCAPE_HASH = {
     '&' => '&amp;',
@@ -257,7 +262,8 @@ module Escape
   # This function is not appropriate for escaping HTML element attribute
   # because quotes are not escaped.
   def html_text(str)
-    str.gsub(/[&<>]/) {|ch| HTML_TEXT_ESCAPE_HASH[ch] }
+    s = str.gsub(/[&<>]/) {|ch| HTML_TEXT_ESCAPE_HASH[ch] }
+    HTMLEscaped.new_no_dup(s)
   end
 
   # :stopdoc:
@@ -283,6 +289,7 @@ module Escape
   # * '"' to '&quot;'
   #
   def html_attr_value(str)
-    '"' + str.gsub(/[&<>"]/) {|ch| HTML_ATTR_ESCAPE_HASH[ch] } + '"'
+    s = '"' + str.gsub(/[&<>"]/) {|ch| HTML_ATTR_ESCAPE_HASH[ch] } + '"'
+    HTMLEscaped.new_no_dup(s)
   end
 end

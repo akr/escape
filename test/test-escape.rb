@@ -5,14 +5,6 @@ class TestEscape < Test::Unit::TestCase
   def test_shell_command
     assert_equal("com arg", Escape.shell_command(%w[com arg]))
   end
-
-  def test_html_text
-    assert_equal('a&amp;&lt;&gt;"', Escape.html_text('a&<>"'))
-  end
-
-  def test_html_attr_value
-    assert_equal('"a&amp;&lt;&gt;&quot;"', Escape.html_attr_value('a&<>"'))
-  end
 end
 
 class TestEscapePercentEncoded < Test::Unit::TestCase
@@ -61,5 +53,18 @@ class TestEscapePercentEncoded < Test::Unit::TestCase
     assert_equal_pe("k=1&k=2", Escape.html_form([["k","1"], ["k","2"]]))
     assert_equal_pe("k%3D=%26%3B%3D", Escape.html_form([["k=","&;="]]))
   end
+end
 
+class TestEscapeHTMLEscaped < Test::Unit::TestCase
+  def assert_equal_he(str, tst)
+    assert_equal(Escape::HTMLEscaped.new(str), tst)
+  end
+
+  def test_html_text
+    assert_equal_he('a&amp;&lt;&gt;"', Escape.html_text('a&<>"'))
+  end
+
+  def test_html_attr_value
+    assert_equal_he('"a&amp;&lt;&gt;&quot;"', Escape.html_attr_value('a&<>"'))
+  end
 end

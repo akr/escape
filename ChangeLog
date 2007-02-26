@@ -1,5 +1,9 @@
 2007-02-26  Tanaka Akira  <akr@fsij.org>
 
+	* escape.rb: Escape::HTMLEscaped defined.
+	  Escape.html_text and Escape.html_attr_value returns
+	  Escape::HTMLEscaped object instead of a string.
+
 	* escape.rb: Escape::PercentEncoded defined.
 	  Escape.uri_segment, Escape.uri_path and Escape.html_form returns
 	  Escape::PercentEncoded object instead of a string.
