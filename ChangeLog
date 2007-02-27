@@ -1,3 +1,9 @@
+2007-02-27  Tanaka Akira  <akr@fsij.org>
+
+	* escape.rb: make StringWrapper into class.
+	  Escape::ShellEscaped, Escape::HTMLEscaped and Escape::PercentEncoded
+	  inherit it.
+
 2007-02-26  Tanaka Akira  <akr@fsij.org>
 
 	* escape.rb: Escape::ShellEscaped defined.

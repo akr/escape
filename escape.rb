@@ -31,17 +31,14 @@
 module Escape
   module_function
 
-  module StringWrapperC
-    def new(str)
-      super(str.dup)
+  class StringWrapper
+    class << self
+      alias new_no_dup new
+      def new(str)
+        new_no_dup(str.dup)
+      end
     end
 
-    def new_no_dup(str)
-      Class.instance_method(:new).bind(self).call(str)
-    end
-  end
-
-  module StringWrapper
     def initialize(str)
       @str = str
     end
@@ -65,9 +62,7 @@ module Escape
   end
 
 
-  class ShellEscaped
-    extend StringWrapperC
-    include StringWrapper
+  class ShellEscaped < StringWrapper
   end
 
   # Escape.shell_command composes
@@ -120,9 +115,7 @@ module Escape
     end
   end
 
-  class PercentEncoded
-    extend StringWrapperC
-    include StringWrapper
+  class PercentEncoded < StringWrapper
   end
 
   # Escape.uri_segment escapes URI segment using percent-encoding.
@@ -243,9 +236,7 @@ module Escape
     PercentEncoded.new_no_dup(r)
   end
 
-  class HTMLEscaped
-    extend StringWrapperC
-    include StringWrapper
+  class HTMLEscaped < StringWrapper
   end
 
   # :stopdoc:
