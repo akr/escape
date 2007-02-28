@@ -278,10 +278,10 @@ module Escape
 
   # Escape.html_attr_value encodes a string as a double-quoted HTML attribute using character references.
   #
-  #  Escape.html_attr_value("abc") #=> #<Escape::HTMLEscaped: "abc">
-  #  Escape.html_attr_value("a&b") #=> #<Escape::HTMLEscaped: "a&amp;b">
-  #  Escape.html_attr_value("ab&<>\"c") #=> #<Escape::HTMLEscaped: "ab&amp;&lt;&gt;&quot;c">
-  #  Escape.html_attr_value("a'c") #=> #<Escape::HTMLEscaped: "a'c">
+  #  Escape.html_attr_value("abc") #=> #<Escape::HTMLAttrValue: "abc">
+  #  Escape.html_attr_value("a&b") #=> #<Escape::HTMLAttrValue: "a&amp;b">
+  #  Escape.html_attr_value("ab&<>\"c") #=> #<Escape::HTMLAttrValue: "ab&amp;&lt;&gt;&quot;c">
+  #  Escape.html_attr_value("a'c") #=> #<Escape::HTMLAttrValue: "a'c">
   #
   # It escapes 4 characters:
   # * '&' to '&amp;'
