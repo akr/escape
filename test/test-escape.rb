@@ -71,9 +71,13 @@ class TestEscapePercentEncoded < Test::Unit::TestCase
   end
 end
 
-class TestEscapeHTMLEscaped < Test::Unit::TestCase
+class TestEscapeHTML < Test::Unit::TestCase
   def assert_equal_he(str, tst)
     assert_equal(Escape::HTMLEscaped.new(str), tst)
+  end
+
+  def assert_equal_hav(str, tst)
+    assert_equal(Escape::HTMLAttrValue.new(str), tst)
   end
 
   def test_html_text
@@ -81,6 +85,6 @@ class TestEscapeHTMLEscaped < Test::Unit::TestCase
   end
 
   def test_html_attr_value
-    assert_equal_he('"a&amp;&lt;&gt;&quot;"', Escape.html_attr_value('a&<>"'))
+    assert_equal_hav('"a&amp;&lt;&gt;&quot;"', Escape.html_attr_value('a&<>"'))
   end
 end

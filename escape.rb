@@ -273,6 +273,9 @@ module Escape
   }
   # :startdoc:
 
+  class HTMLAttrValue < StringWrapper
+  end
+
   # Escape.html_attr_value encodes a string as a double-quoted HTML attribute using character references.
   #
   #  Escape.html_attr_value("abc") #=> #<Escape::HTMLEscaped: "abc">
@@ -288,6 +291,6 @@ module Escape
   #
   def html_attr_value(str)
     s = '"' + str.gsub(/[&<>"]/) {|ch| HTML_ATTR_ESCAPE_HASH[ch] } + '"'
-    HTMLEscaped.new_no_dup(s)
+    HTMLAttrValue.new_no_dup(s)
   end
 end
