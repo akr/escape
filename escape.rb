@@ -61,7 +61,6 @@ module Escape
     end
   end
 
-
   class ShellEscaped < StringWrapper
   end
 
@@ -70,6 +69,7 @@ module Escape
   # a single shell command line.
   # All shell meta characters are quoted and
   # the words are concatenated with interleaving space.
+  # It returns an instance of ShellEscaped.
   #
   #  Escape.shell_command(["ls", "/"]) #=> #<Escape::ShellEscaped: ls />
   #  Escape.shell_command(["echo", "*"]) #=> #<Escape::ShellEscaped: echo '*'>
@@ -89,6 +89,7 @@ module Escape
   end
 
   # Escape.shell_single_word quotes shell meta characters.
+  # It returns an instance of ShellEscaped.
   #
   # The result string is always single shell word, even if
   # the argument is "".
@@ -119,6 +120,7 @@ module Escape
   end
 
   # Escape.uri_segment escapes URI segment using percent-encoding.
+  # It returns an instance of PercentEncoded.
   #
   #  Escape.uri_segment("a/b") #=> #<Escape::PercentEncoded: a%2Fb>
   #
@@ -140,6 +142,7 @@ module Escape
   # Escape.uri_path escapes URI path using percent-encoding.
   # The given path should be a sequence of (non-escaped) segments separated by "/".
   # The segments cannot contains "/".
+  # It returns an instance of PercentEncoded.
   #
   #  Escape.uri_path("a/b/c") #=> #<Escape::PercentEncoded: a/b/c>
   #  Escape.uri_path("a?b/c?d/e?f") #=> #<Escape::PercentEncoded: a%3Fb/c%3Fd/e%3Ff>
@@ -179,6 +182,7 @@ module Escape
   # :startdoc:
 
   # Escape.html_form composes HTML form key-value pairs as a x-www-form-urlencoded encoded string.
+  # It returns an instance of PercentEncoded.
   #
   # Escape.html_form takes an array of pair of strings or
   # an hash from string to string.
@@ -248,6 +252,7 @@ module Escape
   # :startdoc:
 
   # Escape.html_text escapes a string appropriate for HTML text using character references.
+  # It returns an instance of HTMLEscaped.
   #
   # It escapes 3 characters:
   # * '&' to '&amp;'
@@ -277,6 +282,7 @@ module Escape
   end
 
   # Escape.html_attr_value encodes a string as a double-quoted HTML attribute using character references.
+  # It returns an instance of HTMLAttrValue.
   #
   #  Escape.html_attr_value("abc") #=> #<Escape::HTMLAttrValue: "abc">
   #  Escape.html_attr_value("a&b") #=> #<Escape::HTMLAttrValue: "a&amp;b">
