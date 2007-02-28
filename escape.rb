@@ -75,14 +75,15 @@ module Escape
   #  Escape.shell_command(["echo", "*"]) #=> #<Escape::ShellEscaped: echo '*'>
   #
   # Note that system(*command) and
-  # system(Escape.shell_command(command)) is roughly same.
+  # system(Escape.shell_command(command).to_s) is roughly same.
   # There are two exception as follows.
   # * The first is that the later may invokes /bin/sh.
   # * The second is an interpretation of an array with only one element: 
   #   the element is parsed by the shell with the former but
   #   it is recognized as single word with the later.
   #   For example, system(*["echo foo"]) invokes echo command with an argument "foo".
-  #   But system(Escape.shell_command(["echo foo"])) invokes "echo foo" command without arguments (and it probably fails).
+  #   But system(Escape.shell_command(["echo foo"]).to_s) invokes "echo foo" command
+  #   without arguments (and it probably fails).
   def shell_command(command)
     s = command.map {|word| shell_single_word(word) }.join(' ')
     ShellEscaped.new_no_dup(s)
