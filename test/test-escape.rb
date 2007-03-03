@@ -52,14 +52,17 @@ class TestEscapePercentEncoded < Test::Unit::TestCase
   end
 
   def test_uri_segment
-    assert_kind_of(Escape::PercentEncoded, Escape.uri_segment("foo"))
     assert_equal_pe("a%2Fb", Escape.uri_segment("a/b"))
   end
 
   def test_uri_path
-    assert_kind_of(Escape::PercentEncoded, Escape.uri_path("foo"))
     assert_equal_pe("a/b/c", Escape.uri_path("a/b/c"))
     assert_equal_pe("a%3Fb/c%3Fd/e%3Ff", Escape.uri_path("a?b/c?d/e?f"))
+  end
+
+  def test_uri_path_ary
+    assert_equal_pe("a/b/c", Escape.uri_path(["a", "b", "c"]))
+    assert_equal_pe("%2Fd/f", Escape.uri_path(["/d", "f"]))
   end
 
   def test_html_form

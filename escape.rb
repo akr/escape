@@ -141,12 +141,16 @@ module Escape
   end
 
   # Escape.uri_path escapes URI path using percent-encoding.
-  # The given path should be a sequence of (non-escaped) segments separated by "/".
-  # The segments cannot contains "/".
+  #
+  # The given path should be one of follows.
+  # * a sequence of (non-escaped) segments separated by "/".  (The segments cannot contains "/".)
+  # * an array containing (non-escaped) segments.  (The segments may contains "/".)
+  #
   # It returns an instance of PercentEncoded.
   #
   #  Escape.uri_path("a/b/c") #=> #<Escape::PercentEncoded: a/b/c>
   #  Escape.uri_path("a?b/c?d/e?f") #=> #<Escape::PercentEncoded: a%3Fb/c%3Fd/e%3Ff>
+  #  Escape.uri_path(["/d", "f"]) #=> "%2Fd/f"
   #
   # The path is the part after authority before query in URI, as follows.
   #
@@ -155,8 +159,12 @@ module Escape
   # See RFC 3986 for details of URI.
   #
   # Note that this function is not appropriate to convert OS path to URI.
-  def uri_path(str)
-    s = str.gsub(%r{[^/]+}n) { uri_segment($&) }
+  def uri_path(arg)
+    if arg.respond_to? :to_ary
+      s = arg.map {|elt| uri_segment(elt) }.join('/')
+    else
+      s = arg.gsub(%r{[^/]+}n) { uri_segment($&) }
+    end
     PercentEncoded.new_no_dup(s)
   end
 
