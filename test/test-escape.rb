@@ -47,8 +47,19 @@ class TestEscapeShellEscaped < Test::Unit::TestCase
 end
 
 class TestEscapePercentEncoded < Test::Unit::TestCase
+  def str_to_pe(obj)
+    case obj
+    when String
+      Escape::PercentEncoded.new(obj)
+    when Array
+      obj.map {|e| str_to_pe(e) }
+    else
+      obj
+    end
+  end
+
   def assert_equal_pe(str, tst)
-    assert_equal(Escape::PercentEncoded.new(str), tst)
+    assert_equal(str_to_pe(str), tst)
   end
 
   def test_uri_segment
@@ -71,6 +82,13 @@ class TestEscapePercentEncoded < Test::Unit::TestCase
     assert_equal_pe("a=b;c=d", Escape.html_form([["a","b"], ["c","d"]], ';'))
     assert_equal_pe("k=1&k=2", Escape.html_form([["k","1"], ["k","2"]]))
     assert_equal_pe("k%3D=%26%3B%3D", Escape.html_form([["k=","&;="]]))
+  end
+
+  def test_split_html_form
+    assert_equal_pe([["a", "b"], ["c", "d"]], Escape::PercentEncoded.new("a=b&c=d").split_html_form)
+    assert_equal_pe([["a", "b"], ["c", "d"]], Escape::PercentEncoded.new("a=b;c=d").split_html_form)
+    assert_equal_pe([["k", "1"], ["k", "2"]], Escape::PercentEncoded.new("k=1&k=2").split_html_form)
+    assert_equal_pe([["k%3D", "%26%3B%3D"]], Escape::PercentEncoded.new("k%3D=%26%3B%3D").split_html_form)
   end
 end
 

@@ -117,7 +117,17 @@ module Escape
     end
   end
 
+  class InvalidHTMLForm < StandardError
+  end
   class PercentEncoded < StringWrapper
+    def split_html_form
+      assoc = []
+      @str.split(/[&;]/).each {|s|
+        raise InvalidHTMLForm, "invalid: #{@str}" unless /=/ =~ s
+        assoc << [PercentEncoded.new_no_dup($`), PercentEncoded.new_no_dup($')]
+      }
+      assoc
+    end
   end
 
   # Escape.uri_segment escapes URI segment using percent-encoding.

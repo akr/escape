@@ -2,6 +2,12 @@
 
 	* escape.rb: Escape.uri_path accepts an array of strings.
 
+	* escape.rb: Escape::PercentEncoded#split_html_form implemented.
+
+2007-02-28  Tanaka Akira  <akr@fsij.org>
+
+	* version 0.2 released.
+
 2007-02-28  Tanaka Akira  <akr@fsij.org>
 
 	* escape.rb: Escape::HTMLAttrValue defined.
