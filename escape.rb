@@ -120,6 +120,24 @@ module Escape
   class InvalidHTMLForm < StandardError
   end
   class PercentEncoded < StringWrapper
+    # Escape::PercentEncoded#split_html_form decodes
+    # percent-encoded string as
+    # application/x-www-form-urlencoded
+    # defined by HTML specification.
+    #
+    # It recognizes "&" and ";" as a separator of key-value pairs.
+    #
+    #  Escape::PercentEncoded.new("a=b&c=d")
+    #  #=> [[#<Escape::PercentEncoded: a>, #<Escape::PercentEncoded: b>],
+    #       [#<Escape::PercentEncoded: c>, #<Escape::PercentEncoded: d>]]
+    #
+    #  Escape::PercentEncoded.new("a=b;c=d").split_html_form
+    #  #=> [[#<Escape::PercentEncoded: a>, #<Escape::PercentEncoded: b>],
+    #       [#<Escape::PercentEncoded: c>, #<Escape::PercentEncoded: d>]]
+    #
+    #  Escape::PercentEncoded.new("%3D=%3F").split_html_form
+    #  #=> [[#<Escape::PercentEncoded: %3D>, #<Escape::PercentEncoded: %3F>]]
+    #
     def split_html_form
       assoc = []
       @str.split(/[&;]/).each {|s|
