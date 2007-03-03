@@ -127,6 +127,10 @@ module Escape
     #
     # It recognizes "&" and ";" as a separator of key-value pairs.
     #
+    # If it find is not valid as
+    # application/x-www-form-urlencoded,
+    # Escape::InvalidHTMLForm exception is raised.
+    #
     #  Escape::PercentEncoded.new("a=b&c=d")
     #  #=> [[#<Escape::PercentEncoded: a>, #<Escape::PercentEncoded: b>],
     #       [#<Escape::PercentEncoded: c>, #<Escape::PercentEncoded: d>]]
@@ -140,7 +144,7 @@ module Escape
     #
     def split_html_form
       assoc = []
-      @str.split(/[&;]/).each {|s|
+      @str.split(/[&;]/, -1).each {|s|
         raise InvalidHTMLForm, "invalid: #{@str}" unless /=/ =~ s
         assoc << [PercentEncoded.new_no_dup($`), PercentEncoded.new_no_dup($')]
       }
