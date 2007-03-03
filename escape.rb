@@ -150,7 +150,7 @@ module Escape
   #
   #  Escape.uri_path("a/b/c") #=> #<Escape::PercentEncoded: a/b/c>
   #  Escape.uri_path("a?b/c?d/e?f") #=> #<Escape::PercentEncoded: a%3Fb/c%3Fd/e%3Ff>
-  #  Escape.uri_path(["/d", "f"]) #=> "%2Fd/f"
+  #  Escape.uri_path(%w[/d f]) #=> "%2Fd/f"
   #
   # The path is the part after authority before query in URI, as follows.
   #

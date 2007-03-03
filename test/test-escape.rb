@@ -61,8 +61,8 @@ class TestEscapePercentEncoded < Test::Unit::TestCase
   end
 
   def test_uri_path_ary
-    assert_equal_pe("a/b/c", Escape.uri_path(["a", "b", "c"]))
-    assert_equal_pe("%2Fd/f", Escape.uri_path(["/d", "f"]))
+    assert_equal_pe("a/b/c", Escape.uri_path(%w[a b c]))
+    assert_equal_pe("%2Fd/f", Escape.uri_path(%w[/d f]))
   end
 
   def test_html_form
