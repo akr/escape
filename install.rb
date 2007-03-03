@@ -1,8 +1,9 @@
 #!/usr/bin/env ruby
 
-# usage: ruby install.rb [-n]
+# usage: ruby install.rb [-n] [--destdir=DESTDIR]
 # options:
 #  -n : don't install
+#  --destdir=DESTDIR
 #
 # Author: Tanaka Akira <akr@m17n.org>
 
@@ -86,24 +87,26 @@ def ignore_exc(exc)
 end
 
 $opt_n = false
+$opt_destdir = ""
 ARGV.options {|q|
   q.banner = 'ruby install.rb [opts]'
   q.def_option('--help', 'show this message') {puts q; exit(0)}
   q.def_option('-n', "don't install") { $opt_n = true }
+  q.def_option('--destdir=DESTDIR', "specify DESTDIR") {|destdir| $opt_destdir = destdir }
   q.parse!
 }
 
 if $opt_n
   dir = target_directory
   collect_target.each {|filename|
-    puts "-> #{dir}/#{filename}"
+    puts "-> #{$opt_destdir}#{dir}/#{filename}"
   }
   exit
 else
   File.umask 022
   dir = target_directory
   collect_target.each {|filename|
-    install_file filename, "#{dir}/#{filename}"
+    install_file filename, "#{$opt_destdir}#{dir}/#{filename}"
   }
 end
 
