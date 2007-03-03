@@ -130,6 +130,23 @@ module Escape
     end
   end
 
+  # Escape.percent_encoding escapes URI non-unreserved characters using percent-encoding.
+  # It returns an instance of PercentEncoded.
+  #
+  # The unreserved characters are alphabet, digit, hyphen, dot, underscore and tilde.
+  # [RFC 3986]
+  #
+  #  Escape.percent_encoding("foo") #=> #<Escape::PercentEncoded: foo>
+  #
+  #  Escape.percent_encoding(' !"#$%&\'()*+,-./:;<=>?@[\\]^_`{|}~')
+  #  #=> #<Escape::PercentEncoded: %20%21%22%23%24%25%26%27%28%29%2A%2B%2C-.%2F%3A%3B%3C%3D%3E%3F%40%5B%5C%5D%5E_%60%7B%7C%7D~>
+  def percent_encoding(str)
+    s = str.gsub(%r{[^a-zA-Za-z0-9\-._~]}n) {
+      '%' + $&.unpack("H2")[0].upcase
+    }
+    PercentEncoded.new_no_dup(s)
+  end
+
   # Escape.uri_segment escapes URI segment using percent-encoding.
   # It returns an instance of PercentEncoded.
   #

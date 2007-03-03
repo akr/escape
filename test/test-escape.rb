@@ -62,6 +62,13 @@ class TestEscapePercentEncoded < Test::Unit::TestCase
     assert_equal(str_to_pe(str), tst)
   end
 
+  def test_percent_encoding
+    assert_equal_pe(
+      "%20%21%22%23%24%25%26%27%28%29%2A%2B%2C-.%2F"+
+      "%3A%3B%3C%3D%3E%3F%40%5B%5C%5D%5E_%60%7B%7C%7D~",
+      Escape.percent_encoding(' !"#$%&\'()*+,-./:;<=>?@[\\]^_`{|}~'))
+  end
+
   def test_uri_segment
     assert_equal_pe("a%2Fb", Escape.uri_segment("a/b"))
   end
