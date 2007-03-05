@@ -43,9 +43,11 @@ module Escape
       @str = str
     end
 
-    def to_s
+    def escaped_string
       @str.dup
     end
+
+    alias to_s escaped_string
 
     def inspect
       "\#<#{self.class}: #{@str}>"

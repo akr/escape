@@ -1,3 +1,7 @@
+2007-03-05  Tanaka Akira  <akr@fsij.org>
+
+	* escape.rb (Escape::StringWrapper#escaped_string): New method.
+
 2007-03-03  Tanaka Akira  <akr@fsij.org>
 
 	* escape.rb: Escape.uri_path accepts an array of strings.

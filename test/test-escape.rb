@@ -25,6 +25,10 @@ class TestEscapeStringWrapper < Test::Unit::TestCase
     o = Escape::PercentEncoded.new_no_dup(s)
     assert_equal(s.object_id, o.instance_variable_get(:@str).object_id)
   end
+
+  def test_escaped_string
+    assert_equal("a", Escape::PercentEncoded.new("a").escaped_string)
+  end
 end
 
 class TestEscapeShellEscaped < Test::Unit::TestCase
