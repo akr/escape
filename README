@@ -1,9 +1,5 @@
 = escape - HTML/URI/shell escaping utilities
-<%
-  def version
-    File.read("VERSION").chomp
-  end
-%>
+
 
 escape library provides several HTML/URI/shell escaping functions.
 
@@ -13,7 +9,7 @@ Tanaka Akira <akr@fsij.org>
 
 == Home Page
 
-((<URL:http://www.a-k-r.org/escape/>))
+http://www.a-k-r.org/escape/
 
 == Feature
 
@@ -43,7 +39,7 @@ Tanaka Akira <akr@fsij.org>
 
 == Download
 
-* latest release: ((<escape-<%=version%>.tar.gz|URL:escape-<%=version%>.tar.gz>))
+* latest release: http://www.a-k-r.org/escape/escape-0.2.tar.gz
 
 * development version in Subversion repository:
 
@@ -56,7 +52,7 @@ Tanaka Akira <akr@fsij.org>
 == Reference Manual
 
 See rdoc/classes/Escape.html or
-((<URL:http://www.a-k-r.org/escape/rdoc/classes/Escape.html>))
+http://www.a-k-r.org/escape/rdoc/classes/Escape.html
 
 == License
 
