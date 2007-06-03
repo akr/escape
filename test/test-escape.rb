@@ -128,17 +128,95 @@ class TestEscapeMIME < Test::Unit::TestCase
     assert_equal(Escape::MIMEParameter.new(str), tst)
   end
 
-  def test_token
+  US_ASCII = (0x00..0x7f).map {|byte| [byte].pack("C") }
+  CTLs = (0x00..0x1f).map {|byte| [byte].pack("C") } + ["\x7f"]
+  SPACE = (0x00..0x1f).map {|byte| [byte].pack("C") } + ["\x7f"]
+  OCTETS = (0x00..0xff).map {|byte| [byte].pack("C") }
+
+  MIME_TSPECIALS = [
+    "(", ")", "<", ">", "@",
+    ",", ";", ":", "\\", '"',
+    "/", "[", "]", "?", "="
+  ]
+
+  def test_mime_token
     assert_equal(true, Escape.mime_token?("abc"))
     assert_equal(false, Escape.mime_token?("a=b"))
+    MIME_TSPECIALS.each {|ch|
+      assert_equal(false, Escape.mime_token?(ch))
+    }
+    (US_ASCII-[" "]-CTLs-MIME_TSPECIALS).each {|ch|
+      assert_equal(true, Escape.mime_token?(ch))
+    }
   end
 
-  def test_parameter_value
+  def test_mime_parameter_value
     assert_equal_mime('abc', Escape.mime_parameter_value("abc"))
     assert_equal_mime('"a/b/c"', Escape.mime_parameter_value("a/b/c"))
     assert_equal_mime('"\""', Escape.mime_parameter_value('"'))
+    assert_equal_mime("\"a\n b\"", Escape.mime_parameter_value("a\n b"))
+    assert_equal_mime("\"a\n\tb\"", Escape.mime_parameter_value("a\n\tb"))
+    assert_equal_mime("\"a\r\n b\"", Escape.mime_parameter_value("a\r\n b"))
+    assert_equal_mime("\"a\r\n\tb\"", Escape.mime_parameter_value("a\r\n\tb"))
+    assert_equal_mime("\"\n \"", Escape.mime_parameter_value("\n "))
+    assert_raise(ArgumentError) { Escape.mime_parameter_value("\n \n ") }
     assert_raise(ArgumentError) { Escape.mime_parameter_value("\r") }
     assert_raise(ArgumentError) { Escape.mime_parameter_value("\n") }
     assert_raise(ArgumentError) { Escape.mime_parameter_value("\0") }
+  end
+
+  def test_mime_parameter
+    assert_equal_mime('abc=def', Escape.mime_parameter("abc", "def"))
+    assert_equal_mime('aa="a/b/c"', Escape.mime_parameter("aa", "a/b/c"))
+    assert_raise(ArgumentError) { Escape.mime_parameter("/", "\r") }
+    assert_raise(ArgumentError) { Escape.mime_parameter("n", "\r") }
+    assert_raise(ArgumentError) { Escape.mime_parameter("n", "\n") }
+    assert_raise(ArgumentError) { Escape.mime_parameter("n", "\0") }
+  end
+
+  HTTP_SEPARATORS = [
+    "(", ")", "<", ">", "@",
+    ",", ";", ":", "\\", '"',
+    "/", "[", "]", "?", "=",
+    "{", "}", " ", "\t"
+  ]
+
+  def test_http_token
+    assert_equal(true, Escape.http_token?("abc"))
+    assert_equal(false, Escape.http_token?("a=b"))
+    HTTP_SEPARATORS.each {|ch|
+      assert_equal(false, Escape.http_token?(ch))
+    }
+    (US_ASCII-CTLs-HTTP_SEPARATORS).each {|ch|
+      assert_equal(true, Escape.http_token?(ch))
+    }
+  end
+
+  def test_http_quoted_string
+    assert_equal_mime('"abc"', Escape.http_quoted_string("abc"))
+    assert_equal_mime('"a/b/c"', Escape.http_parameter_value("a/b/c"))
+    assert_equal_mime('"\""', Escape.http_parameter_value('"'))
+    assert_equal_mime('"\\\\"', Escape.http_parameter_value('\\'))
+    assert_equal_mime("\"a\n b\"", Escape.http_parameter_value("a\n b"))
+    assert_equal_mime("\"a\n\tb\"", Escape.http_parameter_value("a\n\tb"))
+    assert_equal_mime("\"a\r\n b\"", Escape.http_parameter_value("a\r\n b"))
+    assert_equal_mime("\"a\r\n\tb\"", Escape.http_parameter_value("a\r\n\tb"))
+    assert_equal_mime("\"\n \n \"", Escape.http_parameter_value("\n \n "))
+    assert_raise(ArgumentError) { Escape.http_quoted_string("\n") }
+
+  end
+
+  def test_http_params_with_sep
+    assert_equal_mime('', Escape.http_params_with_sep("; "))
+    assert_equal_mime('a=b', Escape.http_params_with_sep("; ", "a", "b"))
+    assert_equal_mime('a=b; c=d', Escape.http_params_with_sep("; ", "a", "b", "c", "d"))
+    assert_raise(ArgumentError) { Escape.http_params_with_sep(";", "x") }
+  end
+
+  def test_http_params_with_pre
+    assert_equal_mime('', Escape.http_params_with_pre("; "))
+    assert_equal_mime('; a=b', Escape.http_params_with_pre("; ", "a", "b"))
+    assert_equal_mime('; a=b; c=d', Escape.http_params_with_pre("; ", "a", "b", "c", "d"))
+    assert_raise(ArgumentError) { Escape.http_params_with_pre(";", "x") }
   end
 end

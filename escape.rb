@@ -371,18 +371,29 @@ module Escape
   #
   # token is a sequence of any (US-ASCII) CHAR except SPACE, CTLs, or tspecials.
   def mime_token?(str)
-    /\A[!\#-'*-+\-.0-9A-Z^-~]+\z/ =~ str ? true : false
+    /\A[!\#-'*+\-.0-9A-Z^-~]+\z/ =~ str ? true : false
   end
+
+  # :stopdoc:
+  RFC2822_FWS = /(?:[ \t]*\r?\n)?[ \t]+/
+  # :startdoc:
 
   # Escape.rfc2822_quoted_string escapes a string as quoted-string defined in RFC 2822.
   # It returns an instance of MIMEParameter.
   #
-  # It cannot represents CR, LF and NUL. 
-  # If the string contained them, ArgumentError is raised.
+  # The obsolete syntax in quoted-string is not permitted.
+  # For example, NUL causes ArgumentError.
   #
+  # The given string may contain carriage returns ("\r") and line feeds ("\n").
+  # However they must be part of folding white space: /\r\n[ \t]/ or /\n[ \t]/.
+  # Escape.rfc2822_quoted_string assumes that newlines are represented as
+  # "\n" or "\r\n".
+  #
+  # Escape.rfc2822_quoted_string does not permit consecutive sequence of
+  # folding white spaces such as "\n \n ", according to RFC 2822 syntax.
   def rfc2822_quoted_string(str)
-    if /[\r\n\0]/ =~ str
-      raise ArgumentError, "CR, LF or NUL contained: #{str.inspect}"
+    if /\A(?:#{RFC2822_FWS}?[\x01-\x09\x0b\x0c\x0e-\x7f])*#{RFC2822_FWS}?\z/o !~ str
+      raise ArgumentError, "not representable in quoted-string of RFC 2822: #{str.inspect}"
     end
     s = '"' + str.gsub(/["\\]/, '\\\\\&') + '"'
     MIMEParameter.new_no_dup(s)
@@ -392,13 +403,133 @@ module Escape
   # It returns an instance of MIMEParameter.
   #
   # MIME parameter value is token or quoted-string.
-  # token is returned if possible.
+  # token is used if possible.
   def mime_parameter_value(str)
     if mime_token?(str)
       MIMEParameter.new(str)
     else
       rfc2822_quoted_string(str)
     end
+  end
+
+  # Escape.mime_parameter encodes attribute and value as MIME parameter in RFC 2045.
+  # It returns an instance of MIMEParameter.
+  #
+  # ArgumentError is raised if attribute is not MIME token.
+  #
+  # ArgumentError is raised if value contains CR, LF or NUL.
+  #
+  #  Escape.mime_parameter("n", "v") #=> #<Escape::MIMEParameter: n=v>
+  #  Escape.mime_parameter("charset", "us-ascii") #=> #<Escape::MIMEParameter: charset=us-ascii>
+  #  Escape.mime_parameter("boundary", "gc0pJq0M:08jU534c0p") #=> #<Escape::MIMEParameter: boundary="gc0pJq0M:08jU534c0p">
+  #  Escape.mime_parameter("boundary", "simple boundary") #=> #<Escape::MIMEParameter: boundary="simple boundary">
+  def mime_parameter(attribute, value)
+    unless mime_token?(attribute)
+      raise ArgumentError, "not MIME token: #{attribute.inspect}"
+    end
+    MIMEParameter.new("#{attribute}=#{mime_parameter_value(value)}")
+  end
+
+  # predicate for MIME token.
+  #
+  # token is a sequence of any CHAR except CTLs or separators
+  def http_token?(str)
+    /\A[!\#-'*+\-.0-9A-Z^-z|~]+\z/ =~ str ? true : false 
+  end
+
+  # Escape.http_quoted_string escapes a string as quoted-string defined in RFC 2616.
+  # It returns an instance of MIMEParameter.
+  #
+  # The given string may contain carriage returns ("\r") and line feeds ("\n").
+  # However they must be part of folding white space: /\r\n[ \t]/ or /\n[ \t]/.
+  # Escape.http_quoted_string assumes that newlines are represented as
+  # "\n" or "\r\n".
+  def http_quoted_string(str)
+    if /\A(?:[\0-\x09\x0b\x0c\x0e-\xff]|\r?\n[ \t])*\z/ !~ str
+      raise ArgumentError, "CR or LF not part of folding white space exists: #{str.inspect}"
+    end
+    s = '"' + str.gsub(/["\\]/, '\\\\\&') + '"'
+    MIMEParameter.new_no_dup(s)
+  end
+
+  # Escape.http_parameter_value escapes a string as HTTP parameter value in RFC 2616.
+  # It returns an instance of MIMEParameter.
+  #
+  # HTTP parameter value is token or quoted-string.
+  # token is used if possible.
+  def http_parameter_value(str)
+    if http_token?(str)
+      MIMEParameter.new(str)
+    else
+      http_quoted_string(str)
+    end
+  end
+
+  # Escape.http_parameter encodes attribute and value as HTTP parameter in RFC 2616.
+  # It returns an instance of MIMEParameter.
+  #
+  # ArgumentError is raised if attribute is not HTTP token.
+  #
+  # ArgumentError is raised if value is not representable in quoted-string.
+  #
+  #  Escape.http_parameter("n", "v") #=> #<Escape::MIMEParameter: n=v>
+  #  Escape.http_parameter("charset", "us-ascii") #=> #<Escape::MIMEParameter: charset=us-ascii>
+  #  Escape.http_parameter("q", "0.2") #=> #<Escape::MIMEParameter: q=0.2>
+  def http_parameter(attribute, value)
+    unless http_token?(attribute)
+      raise ArgumentError, "not HTTP token: #{attribute.inspect}"
+    end
+    MIMEParameter.new("#{attribute}=#{http_parameter_value(value)}")
+  end
+
+  # :stopdoc:
+  def _parse_http_params_args(args)
+    pairs = []
+    until args.empty?
+      if args[0].respond_to?(:to_str) && args[1].respond_to?(:to_str)
+        pairs << [args.shift, args.shift]
+      else
+        raise ArgumentError, "unexpected argument: #{args.inspect}"
+      end
+    end
+    pairs
+  end
+  # :startdoc:
+
+  # Escape.http_params_with_sep encodes parameters and joins with sep.
+  #
+  #  Escape.http_params_with_sep("; ", "foo", "bar")
+  #  #=> #<Escape::MIMEParameter: foo=bar>
+  #
+  #  Escape.http_params_with_sep("; ", "foo", "bar", "hoge", "fuga")
+  #  #=> #<Escape::MIMEParameter: foo=bar; hoge=fuga>
+  #
+  # If args are empty, empty MIMEParameter is returned.
+  #
+  #  Escape.http_params_with_sep("; ") #=> #<Escape::MIMEParameter: >
+  #
+  def http_params_with_sep(sep, *args)
+    pairs = _parse_http_params_args(args)
+    s = pairs.map {|attribute, value| http_parameter(attribute, value) }.join(sep)
+    MIMEParameter.new_no_dup(s)
+  end
+
+  # Escape.http_params_with_pre encodes parameters and joins with given prefix.
+  #
+  #  Escape.http_params_with_pre("; ", "foo", "bar")                
+  #  #=> #<Escape::MIMEParameter: ; foo=bar>
+  #
+  #  Escape.http_params_with_pre("; ", "foo", "bar", "hoge", "fuga")
+  #  #=> #<Escape::MIMEParameter: ; foo=bar; hoge=fuga>
+  #
+  # If args are empty, empty MIMEParameter is returned.
+  #
+  #  Escape.http_params_with_pre("; ") #=> #<Escape::MIMEParameter: >
+  #
+  def http_params_with_pre(pre, *args)
+    pairs = _parse_http_params_args(args)
+    s = pairs.map {|attribute, value| pre + http_parameter(attribute, value).to_s }.join('')
+    MIMEParameter.new_no_dup(s)
   end
 
 end

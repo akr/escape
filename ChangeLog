@@ -4,6 +4,13 @@
 	  (Escape.mime_token?): new method.
 	  (Escape.rfc2822_quoted_string): ditto.
 	  (Escape.mime_parameter_value): ditto.
+	  (Escape.mime_parameter): ditto.
+	  (Escape.http_token?): ditto.
+	  (Escape.http_quoted_string): ditto.
+	  (Escape.http_parameter_value): ditto.
+	  (Escape.http_parameter): ditto.
+	  (Escape.http_params_with_sep): ditto.
+	  (Escape.http_params_with_pre): ditto.
 
 2007-03-05  Tanaka Akira  <akr@fsij.org>
 
