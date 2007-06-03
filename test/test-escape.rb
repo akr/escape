@@ -122,3 +122,23 @@ class TestEscapeHTML < Test::Unit::TestCase
     assert_equal_hav('"a&amp;&lt;&gt;&quot;"', Escape.html_attr_value('a&<>"'))
   end
 end
+
+class TestEscapeMIME < Test::Unit::TestCase
+  def assert_equal_mime(str, tst)
+    assert_equal(Escape::MIMEParameter.new(str), tst)
+  end
+
+  def test_token
+    assert_equal(true, Escape.mime_token?("abc"))
+    assert_equal(false, Escape.mime_token?("a=b"))
+  end
+
+  def test_parameter_value
+    assert_equal_mime('abc', Escape.mime_parameter_value("abc"))
+    assert_equal_mime('"a/b/c"', Escape.mime_parameter_value("a/b/c"))
+    assert_equal_mime('"\""', Escape.mime_parameter_value('"'))
+    assert_raise(ArgumentError) { Escape.mime_parameter_value("\r") }
+    assert_raise(ArgumentError) { Escape.mime_parameter_value("\n") }
+    assert_raise(ArgumentError) { Escape.mime_parameter_value("\0") }
+  end
+end

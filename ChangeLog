@@ -1,3 +1,10 @@
+2007-06-03  Tanaka Akira  <akr@fsij.org>
+
+	* escape.rb (Escape::MIMEParameter): new class.
+	  (Escape.mime_token?): new method.
+	  (Escape.rfc2822_quoted_string): ditto.
+	  (Escape.mime_parameter_value): ditto.
+
 2007-03-05  Tanaka Akira  <akr@fsij.org>
 
 	* escape.rb (Escape::StringWrapper#escaped_string): New method.

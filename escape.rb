@@ -28,6 +28,7 @@
 # * URI
 # * HTML
 # * shell command
+# * MIME parameter
 module Escape
   module_function
 
@@ -359,4 +360,45 @@ module Escape
     s = '"' + str.gsub(/[&<>"]/) {|ch| HTML_ATTR_ESCAPE_HASH[ch] } + '"'
     HTMLAttrValue.new_no_dup(s)
   end
+
+  # MIMEParameter represents parameter, token, quoted-string in MIME.
+  # parameter and token is defined in RFC 2045.
+  # quoted-string is defined in RFC 822.
+  class MIMEParameter < StringWrapper
+  end
+
+  # predicate for MIME token.
+  #
+  # token is a sequence of any (US-ASCII) CHAR except SPACE, CTLs, or tspecials.
+  def mime_token?(str)
+    /\A[!\#-'*-+\-.0-9A-Z^-~]+\z/ =~ str ? true : false
+  end
+
+  # Escape.rfc2822_quoted_string escapes a string as quoted-string defined in RFC 2822.
+  # It returns an instance of MIMEParameter.
+  #
+  # It cannot represents CR, LF and NUL. 
+  # If the string contained them, ArgumentError is raised.
+  #
+  def rfc2822_quoted_string(str)
+    if /[\r\n\0]/ =~ str
+      raise ArgumentError, "CR, LF or NUL contained: #{str.inspect}"
+    end
+    s = '"' + str.gsub(/["\\]/, '\\\\\&') + '"'
+    MIMEParameter.new_no_dup(s)
+  end
+
+  # Escape.mime_parameter_value escapes a string as MIME parameter value in RFC 2045.
+  # It returns an instance of MIMEParameter.
+  #
+  # MIME parameter value is token or quoted-string.
+  # token is returned if possible.
+  def mime_parameter_value(str)
+    if mime_token?(str)
+      MIMEParameter.new(str)
+    else
+      rfc2822_quoted_string(str)
+    end
+  end
+
 end
