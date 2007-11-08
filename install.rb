@@ -1,9 +1,10 @@
 #!/usr/bin/env ruby
 
-# usage: ruby install.rb [-n] [--destdir=DESTDIR]
+# usage: ruby install.rb [-n] [--destdir=DESTDIR] [--vendor]
 # options:
 #  -n : don't install
 #  --destdir=DESTDIR
+#  --vendor
 #
 # Author: Tanaka Akira <akr@m17n.org>
 
