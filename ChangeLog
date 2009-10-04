@@ -1,3 +1,8 @@
+2009-10-04  Tanaka Akira  <akr@fsij.org>
+
+	* escape.rb (Escape.percent_encoding): remove duplicates in regex
+	  character range to avoid a warning.
+
 2007-06-03  Tanaka Akira  <akr@fsij.org>
 
 	* escape.rb (Escape::MIMEParameter): new class.
