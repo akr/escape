@@ -1,6 +1,5 @@
 = escape - HTML/URI/shell escaping utilities
 
-
 escape library provides several HTML/URI/shell escaping functions.
 
 == Author
@@ -41,9 +40,7 @@ http://www.a-k-r.org/escape/
 
 * latest release: http://www.a-k-r.org/escape/escape-0.2.tar.gz
 
-* development version in Subversion repository:
-
-    % svn co svn://svn@svn.a-k-r.org/akr/escape/trunk escape
+* development version: http://github.com/akr/escape
 
 == Install
 
