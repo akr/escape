@@ -93,6 +93,7 @@ class TestEscapePercentEncoded < Test::Unit::TestCase
     assert_equal_pe("a=b;c=d", Escape.html_form([["a","b"], ["c","d"]], ';'))
     assert_equal_pe("k=1&k=2", Escape.html_form([["k","1"], ["k","2"]]))
     assert_equal_pe("k%3D=%26%3B%3D", Escape.html_form([["k=","&;="]]))
+    assert_equal_pe("+=+", Escape.html_form([[" "," "]]))
   end
 
   def test_split_html_form
@@ -100,6 +101,7 @@ class TestEscapePercentEncoded < Test::Unit::TestCase
     assert_equal_pe([["a", "b"], ["c", "d"]], Escape::PercentEncoded.new("a=b;c=d").split_html_form)
     assert_equal_pe([["k", "1"], ["k", "2"]], Escape::PercentEncoded.new("k=1&k=2").split_html_form)
     assert_equal_pe([["k%3D", "%26%3B%3D"]], Escape::PercentEncoded.new("k%3D=%26%3B%3D").split_html_form)
+    assert_equal_pe([[" ", " "]], Escape::PercentEncoded.new("+=+").split_html_form)
     assert_raise(Escape::InvalidHTMLForm) { Escape::PercentEncoded.new("a=b;cd").split_html_form }
     assert_raise(Escape::InvalidHTMLForm) { Escape::PercentEncoded.new("a=b;c=d;").split_html_form }
   end
