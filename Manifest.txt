@@ -1,0 +1,6 @@
+.autotest
+Manifest.txt
+README.txt
+Rakefile
+lib/escape.rb
+test/test_escape.rb
