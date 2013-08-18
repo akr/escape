@@ -30,6 +30,7 @@
 # * shell command
 # * MIME parameter
 module Escape
+  VERSION = "0.3"
   module_function
 
   class StringWrapper
