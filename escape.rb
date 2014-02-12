@@ -1,28 +1,32 @@
 # escape.rb - escape/unescape library for several formats
 #
-# Copyright (C) 2006,2007,2009 Tanaka Akira  <akr@fsij.org>
-# 
+# Copyright (C) 2006-2010 Tanaka Akira  <akr@fsij.org>
+#
 # Redistribution and use in source and binary forms, with or without
-# modification, are permitted provided that the following conditions are met:
-# 
-#  1. Redistributions of source code must retain the above copyright notice, this
-#     list of conditions and the following disclaimer.
-#  2. Redistributions in binary form must reproduce the above copyright notice,
-#     this list of conditions and the following disclaimer in the documentation
-#     and/or other materials provided with the distribution.
-#  3. The name of the author may not be used to endorse or promote products
-#     derived from this software without specific prior written permission.
-# 
-# THIS SOFTWARE IS PROVIDED BY THE AUTHOR ``AS IS'' AND ANY EXPRESS OR IMPLIED
-# WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
-# MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO
-# EVENT SHALL THE AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
-# EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT
-# OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
-# INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
-# CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING
-# IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY
-# OF SUCH DAMAGE.
+# modification, are permitted provided that the following conditions
+# are met:
+#
+#  1. Redistributions of source code must retain the above copyright
+#     notice, this list of conditions and the following disclaimer.
+#  2. Redistributions in binary form must reproduce the above
+#     copyright notice, this list of conditions and the following
+#     disclaimer in the documentation and/or other materials provided
+#     with the distribution.
+#  3. The name of the author may not be used to endorse or promote
+#     products derived from this software without specific prior
+#     written permission.
+#
+# THIS SOFTWARE IS PROVIDED BY THE AUTHOR ``AS IS'' AND ANY EXPRESS
+# OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+# WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+# ARE DISCLAIMED. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY
+# DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+# DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE
+# GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+# INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
+# WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE
+# OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
+# EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 # Escape module provides several escape functions.
 # * URI
@@ -81,7 +85,7 @@ module Escape
   # system(Escape.shell_command(command).to_s) is roughly same.
   # There are two exception as follows.
   # * The first is that the later may invokes /bin/sh.
-  # * The second is an interpretation of an array with only one element: 
+  # * The second is an interpretation of an array with only one element:
   #   the element is parsed by the shell with the former but
   #   it is recognized as single word with the later.
   #   For example, system(*["echo foo"]) invokes echo command with an argument "foo".
@@ -442,7 +446,7 @@ module Escape
   #
   # token is a sequence of any CHAR except CTLs or separators
   def http_token?(str)
-    /\A[!\#-'*+\-.0-9A-Z^-z|~]+\z/ =~ str ? true : false 
+    /\A[!\#-'*+\-.0-9A-Z^-z|~]+\z/ =~ str ? true : false
   end
 
   # Escape.http_quoted_string escapes a string as quoted-string defined in RFC 2616.
@@ -524,7 +528,7 @@ module Escape
 
   # Escape.http_params_with_pre encodes parameters and joins with given prefix.
   #
-  #  Escape.http_params_with_pre("; ", "foo", "bar")                
+  #  Escape.http_params_with_pre("; ", "foo", "bar")
   #  #=> #<Escape::MIMEParameter: ; foo=bar>
   #
   #  Escape.http_params_with_pre("; ", "foo", "bar", "hoge", "fuga")
