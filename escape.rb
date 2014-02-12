@@ -1,6 +1,6 @@
 # escape.rb - escape/unescape library for several formats
 #
-# Copyright (C) 2006-2010 Tanaka Akira  <akr@fsij.org>
+# Copyright (C) 2006-2014 Tanaka Akira  <akr@fsij.org>
 #
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions
@@ -544,4 +544,45 @@ module Escape
     MIMEParameter.new_no_dup(s)
   end
 
+  class LTSVEscaped < StringWrapper
+  end
+
+  def ltsv_line(assoc)
+    result = ''
+    assoc.each {|k, v|
+      result << _ltsv_word(k)
+      result << ':'
+      result << _ltsv_word(v)
+      result << "\t"
+    }
+    result.sub!(/\t\z/, "\n")
+    LTSVEscaped.new_no_dup(result)
+  end
+
+  def _ltsv_word(str)
+    if /\A[ !#-9;-\[\]-~]*\z/ =~ str
+      # zero or more printable ASCII characters (including space) without '"', ':' and '\\'.
+      str
+    else
+      '"' +
+      str.gsub(/[^ !#-9;-\[\]-~]/) {
+        ch = $&
+        case ch
+        when "\0"; '\0'
+        when "\a"; '\a'
+        when "\b"; '\b'
+        when "\f"; '\f'
+        when "\n"; '\n'
+        when "\r"; '\r'
+        when "\t"; '\t'
+        when "\v"; '\v'
+        when "\e"; '\e'
+        else
+          ch = ch.dup.force_encoding("ASCII-8BIT") if ch.respond_to?(:force_encoding)
+          ch.gsub(/./m) {|byte| "\\x%02X" % byte.ord }
+        end
+      } +
+      '"'
+    end
+  end
 end
