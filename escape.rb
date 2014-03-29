@@ -545,6 +545,13 @@ module Escape
   end
 
   class LTSVEscaped < StringWrapper
+    def inspect
+      if /\n\z/ =~ @str
+        "\#<#{self.class}: #{@str.chomp}>"
+      else
+        "\#<#{self.class}: #{@str} (no newline)>"
+      end
+    end
   end
 
   def ltsv_line(assoc)
